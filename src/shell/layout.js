@@ -1,5 +1,6 @@
 /* ---------- shell ---------- */
 import { MOD, TODAY, diffD, esc, parse } from '../core/utils.js';
+import { t } from '../core/i18n.js';
 import { ic, wsLogo } from '../core/icons.js';
 import { PSTAT } from '../core/constants.js';
 import { D, S, allTasks, mem, pColor, proj, team, teamsList, visibleProjects } from '../core/store.js';
@@ -27,12 +28,12 @@ import { pageArchive } from '../features/archive.js';
 
 export function renderShell() {
   const u = S.ui;
-  return `<button class="skip" data-a="skipToContent">Skip to content</button><div class="shell ${u.collapsed ? 'collapsed' : ''} ${u.mnav ? 'mnav' : ''} ${u.fx.tabs ? 'fx-tabs' : ''}">
+  return `<button class="skip" data-a="skipToContent">${t('Skip to content')}</button><div class="shell ${u.collapsed ? 'collapsed' : ''} ${u.mnav ? 'mnav' : ''} ${u.fx.tabs ? 'fx-tabs' : ''}">
     ${renderSidebar()}
     ${u.mnav ? '<div class="side-scrim" data-a="closeMnav"></div>' : ''}
     <main class="main" id="main">
       ${renderTopbar()}
-      ${u.offline ? `<div class="offline-bar" role="alert">${ic('wifi-off', 15)}<span><b>You're offline.</b> Changes won't be saved until your connection is back.</span><span class="sp"></span><button class="btn btn-sm btn-secondary" data-a="retryOnline">Try again</button></div>` : ''}
+      ${u.offline ? `<div class="offline-bar" role="alert">${ic('wifi-off', 15)}<span><b>${t("You're offline.")}</b> ${t("Changes won't be saved until your connection is back.")}</span><span class="sp"></span><button class="btn btn-sm btn-secondary" data-a="retryOnline">${t('Try again')}</button></div>` : ''}
       <div class="content ${u.fx.route ? 'fx-route' : ''}" id="main-content" tabindex="-1" data-keep="c:${u.route}:${u.params.id || ''}:${u.params.tab || ''}:${u.params.sec || ''}">${u.loading ? skeleton() : renderPage()}</div>
     </main>
     ${renderBottomNav()}
@@ -83,55 +84,55 @@ export function renderSidebar() {
   const myOpen = allTasks().filter(t => t.assignee === d.me && t.status !== 'done' && t.due && diffD(parse(t.due), TODAY) <= 0).length;
   const projs = visibleProjects().filter(p => p.status !== 'complete');
   const inProj = u.route === 'project' ? u.params.id : null;
-  return `<nav class="side" aria-label="Main">
+  return `<nav class="side" aria-label="${t('Main')}">
     <div class="side-top">
       <div class="row" style="gap:2px">
-        <button class="ws grow" data-a="pop" data-pop="ws" aria-haspopup="menu" aria-label="Switch workspace">
+        <button class="ws grow" data-a="pop" data-pop="ws" aria-haspopup="menu" aria-label="${t('Switch workspace')}">
           ${wsLogo(d.ws, 22)}
           <span class="ws-name trunc">${esc(d.ws.name)}</span>
           <span class="chev-d faint">${ic('chevrons-up-down', 13)}</span>
         </button>
-        ${u.collapsed ? '' : `<button class="ibtn ibtn-sm hide-m" data-a="toggleSide" data-tip="Collapse sidebar  [" aria-label="Collapse sidebar">${ic('panel-left', 15)}</button>`}
+        ${u.collapsed ? '' : `<button class="ibtn ibtn-sm hide-m" data-a="toggleSide" data-tip="${t('Collapse sidebar')}  [" aria-label="${t('Collapse sidebar')}">${ic('panel-left', 15)}</button>`}
       </div>
     </div>
     <div class="side-scroll" data-keep="side">
-      ${u.collapsed ? `<button class="sitem" data-a="toggleSide" data-tip="Expand sidebar" data-tip-pos="right" aria-label="Expand sidebar">${ic('panel-left', 16)}</button>` : ''}
-      ${sItem('home', 'Home', 'house')}
-      ${sItem('inbox', 'Inbox', 'inbox', { ct: unreadInbox || '', dot: true })}
-      ${sItem('mytasks', 'My Tasks', 'circle-check', { ct: myOpen || '' })}
-      ${sItem('favorites', 'Favorites', 'star')}
-      ${sItem('notifications', 'Notifications', 'bell', { ct: unreadAll || '' })}
+      ${u.collapsed ? `<button class="sitem" data-a="toggleSide" data-tip="${t('Expand sidebar')}" data-tip-pos="right" aria-label="${t('Expand sidebar')}">${ic('panel-left', 16)}</button>` : ''}
+      ${sItem('home', t('Home'), 'house')}
+      ${sItem('inbox', t('Inbox'), 'inbox', { ct: unreadInbox || '', dot: true })}
+      ${sItem('mytasks', t('My Tasks'), 'circle-check', { ct: myOpen || '' })}
+      ${sItem('favorites', t('Favorites'), 'star')}
+      ${sItem('notifications', t('Notifications'), 'bell', { ct: unreadAll || '' })}
       <div class="sgroup">
-        <div class="sgroup-h">Workspace</div>
-        ${sItem('overview', 'Overview', 'layout-dashboard')}
-        ${sItem('projects', 'Projects', 'folder-kanban')}
-        ${sItem('tasks', 'Tasks', 'list-checks')}
-        ${sItem('calendar', 'Calendar', 'calendar')}
-        ${sItem('timeline', 'Timeline', 'chart-gantt')}
-        ${sItem('members', 'Members', 'users')}
-        ${sItem('activity', 'Activity', 'activity')}
+        <div class="sgroup-h">${t('Workspace')}</div>
+        ${sItem('overview', t('Overview'), 'layout-dashboard')}
+        ${sItem('projects', t('Projects'), 'folder-kanban')}
+        ${sItem('tasks', t('Tasks'), 'list-checks')}
+        ${sItem('calendar', t('Calendar'), 'calendar')}
+        ${sItem('timeline', t('Timeline'), 'chart-gantt')}
+        ${sItem('members', t('Members'), 'users')}
+        ${sItem('activity', t('Activity'), 'activity')}
       </div>
       <div class="sgroup" id="side-projects">
-        <div class="sgroup-h"><span>Projects</span><span class="sp"></span><button class="ibtn ibtn-xs" data-a="newProject" data-tip="New project  P" aria-label="New project">${ic('plus', 14)}</button></div>
+        <div class="sgroup-h"><span>${t('Projects')}</span><span class="sp"></span><button class="ibtn ibtn-xs" data-a="newProject" data-tip="${t('New project')}  P" aria-label="${t('New project')}">${ic('plus', 14)}</button></div>
         ${projs
           .map(p => {
             const open = !!u.expanded[p.id];
             const on = inProj === p.id;
             return `<div class="sproj" data-proj-drop="${p.id}">
             <div class="sitem ${on ? 'on' : ''}" draggable="true" data-drag-proj="${p.id}" data-a="go" data-r="project" data-id="${p.id}" data-ctx="project" role="link" tabindex="0" ${u.collapsed ? `data-tip="${esc(p.name)}" data-tip-pos="right"` : ''}>
-              <span class="pico" style="--c:${pColor(p)}" data-a="toggleExpand" data-id="${p.id}" aria-label="Toggle sub-pages">${ic(p.icon, 12)}</span>
+              <span class="pico" style="--c:${pColor(p)}" data-a="toggleExpand" data-id="${p.id}" aria-label="${t('Toggle sub-pages')}">${ic(p.icon, 12)}</span>
               <span class="trunc">${esc(p.name)}</span>
               ${p.fav ? `<span class="fav">${ic('star', 11)}</span>` : ''}
               ${p.private ? `<span class="faint" style="margin-left:4px">${ic('lock', 11)}</span>` : ''}
-              <span class="sdot" style="background:${PSTAT[p.status].c}" title="${PSTAT[p.status].name}"></span>
-              <span class="hov"><span class="ibtn ibtn-xs" data-a="ctxBtn" data-ctx="project" data-id="${p.id}" aria-label="Project options">${ic('ellipsis', 14)}</span><span class="ibtn ibtn-xs" data-a="toggleExpand" data-id="${p.id}" aria-label="Expand">${ic('chevron-right', 13, 'chev ' + (open ? 'open' : ''))}</span></span>
+              <span class="sdot" style="background:${PSTAT[p.status].c}" title="${t(PSTAT[p.status].name)}"></span>
+              <span class="hov"><span class="ibtn ibtn-xs" data-a="ctxBtn" data-ctx="project" data-id="${p.id}" aria-label="${t('Project options')}">${ic('ellipsis', 14)}</span><span class="ibtn ibtn-xs" data-a="toggleExpand" data-id="${p.id}" aria-label="${t('Expand')}">${ic('chevron-right', 13, 'chev ' + (open ? 'open' : ''))}</span></span>
             </div>
             <div class="sub ${open && !u.collapsed ? 'open' : ''}">
               ${[
-                ['board', 'Board', 'square-kanban'],
-                ['list', 'List', 'list'],
-                ['timeline', 'Timeline', 'chart-gantt'],
-                ['files', 'Files', 'paperclip'],
+                ['board', t('Board'), 'square-kanban'],
+                ['list', t('List'), 'list'],
+                ['timeline', t('Timeline'), 'chart-gantt'],
+                ['files', t('Files'), 'paperclip'],
               ]
                 .map(
                   ([tab, n, i]) =>
@@ -142,19 +143,19 @@ export function renderSidebar() {
           </div>`;
           })
           .join('')}
-        ${sItem('archive', 'Archive', 'archive', { ct: D().tasks.filter(t => t.archived).length + D().projects.filter(p => p.archived).length || '' })}
+        ${sItem('archive', t('Archive'), 'archive', { ct: D().tasks.filter(t => t.archived).length + D().projects.filter(p => p.archived).length || '' })}
       </div>
       <div class="sgroup">
-        <div class="sgroup-h"><span>Teams</span><span class="sp"></span><button class="ibtn ibtn-xs" data-a="newTeam" data-tip="New team" aria-label="New team">${ic('plus', 14)}</button></div>
+        <div class="sgroup-h"><span>${t('Teams')}</span><span class="sp"></span><button class="ibtn ibtn-xs" data-a="newTeam" data-tip="${t('New team')}" aria-label="${t('New team')}">${ic('plus', 14)}</button></div>
         ${teamsList()
-          .map(t => sItem('team', t.name, t.icon, { id: t.id }))
+          .map(tm => sItem('team', tm.name, tm.icon, { id: tm.id }))
           .join('')}
       </div>
     </div>
     <div class="side-bot">
-      <button class="sitem" data-a="pop" data-pop="help" ${u.collapsed ? 'data-tip="Help" data-tip-pos="right"' : ''}>${ic('circle-help', 16)}<span>Help & resources</span></button>
-      ${sItem('settings', 'Settings', 'settings')}
-      <button class="sitem" data-a="pop" data-pop="user" style="height:36px" ${u.collapsed ? 'data-tip="Profile" data-tip-pos="right"' : ''}>${av(d.me, 'presence', false)}<span class="trunc" style="color:var(--text);font-weight:500">${esc(S.prefs.name)}</span><span class="ct">${ic('chevrons-up-down', 13)}</span></button>
+      <button class="sitem" data-a="pop" data-pop="help" ${u.collapsed ? `data-tip="${t('Help')}" data-tip-pos="right"` : ''}>${ic('circle-help', 16)}<span>${t('Help & resources')}</span></button>
+      ${sItem('settings', t('Settings'), 'settings')}
+      <button class="sitem" data-a="pop" data-pop="user" style="height:36px" ${u.collapsed ? `data-tip="${t('Profile')}" data-tip-pos="right"` : ''}>${av(d.me, 'presence', false)}<span class="trunc" style="color:var(--text);font-weight:500">${esc(S.prefs.name)}</span><span class="ct">${ic('chevrons-up-down', 13)}</span></button>
     </div>
   </nav>`;
 }
@@ -166,7 +167,7 @@ export function crumbs() {
   const c = (label, act = '', cur = false, icon = '') => `<button class="${cur ? 'cur' : ''}" ${act}>${icon}${esc(label)}</button>`;
   if (r === 'project') {
     const p = proj(u.params.id);
-    out.push(c('Projects', 'data-a="go" data-r="projects"'));
+    out.push(c(t('Projects'), 'data-a="go" data-r="projects"'));
     if (p)
       out.push(
         c(
@@ -177,26 +178,26 @@ export function crumbs() {
         ),
       );
   } else if (r === 'member') {
-    out.push(c('Members', 'data-a="go" data-r="members"'));
-    out.push(c(mem(u.params.id)?.name || 'Member', '', true));
+    out.push(c(t('Members'), 'data-a="go" data-r="members"'));
+    out.push(c(mem(u.params.id)?.name || t('Member'), '', true));
   } else if (r === 'team') {
-    out.push(c('Teams', 'data-a="go" data-r="teams"'));
-    out.push(c(team(u.params.id)?.name || 'Team', '', true));
+    out.push(c(t('Teams'), 'data-a="go" data-r="teams"'));
+    out.push(c(team(u.params.id)?.name || t('Team'), '', true));
   } else if (r === 'settings') {
-    out.push(c('Settings', '', true));
-  } else out.push(c(ROUTE_NAMES[r] || 'Not found', '', true));
+    out.push(c(t('Settings'), '', true));
+  } else out.push(c(ROUTE_NAMES[r] ? t(ROUTE_NAMES[r]) : t('Not found'), '', true));
   return out.join('<span class="sep">/</span>');
 }
 export function renderTopbar() {
   return `<header class="topbar">
-    <button class="ibtn" data-a="openMnav" aria-label="Open navigation" style="display:none" id="mnav-btn">${ic('menu', 17)}</button>
+    <button class="ibtn" data-a="openMnav" aria-label="${t('Open navigation')}" style="display:none" id="mnav-btn">${ic('menu', 17)}</button>
     <style>@media(max-width:900px){#mnav-btn{display:inline-flex!important}}</style>
-    <nav class="crumbs trunc" aria-label="Breadcrumb">${crumbs()}</nav>
+    <nav class="crumbs trunc" aria-label="${t('Breadcrumb')}">${crumbs()}</nav>
     <span class="sp"></span>
-    <button class="topsearch" data-a="openPalette" aria-label="Search and commands">${ic('search', 14)}<span class="lbltxt">Search or jump to…</span><span class="kbd">${MOD}K</span></button>
-    <button class="ibtn" data-a="go" data-r="notifications" data-tip="Notifications" aria-label="Notifications">${ic('bell', 16)}${D().notifs.some(n => !n.read) ? '<span style="position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--surface)"></span>' : ''}</button>
-    <button class="btn btn-secondary btn-sm" data-a="pop" data-pop="create" aria-haspopup="menu" aria-label="Create new">${ic('plus', 14)}<span class="hide-m">New</span>${ic('chevron-down', 12, 'hide-m')}</button>
-    <button class="ibtn hide-m" data-a="pop" data-pop="user" aria-label="Account menu" style="width:auto;padding:0 2px">${av(D().me, 'md', false)}</button>
+    <button class="topsearch" data-a="openPalette" aria-label="${t('Search and commands')}">${ic('search', 14)}<span class="lbltxt">${t('Search or jump to…')}</span><span class="kbd">${MOD}K</span></button>
+    <button class="ibtn" data-a="go" data-r="notifications" data-tip="${t('Notifications')}" aria-label="${t('Notifications')}">${ic('bell', 16)}${D().notifs.some(n => !n.read) ? '<span style="position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--surface)"></span>' : ''}</button>
+    <button class="btn btn-secondary btn-sm" data-a="pop" data-pop="create" aria-haspopup="menu" aria-label="${t('Create new')}">${ic('plus', 14)}<span class="hide-m">${t('New')}</span>${ic('chevron-down', 12, 'hide-m')}</button>
+    <button class="ibtn hide-m" data-a="pop" data-pop="user" aria-label="${t('Account menu')}" style="width:auto;padding:0 2px">${av(D().me, 'md', false)}</button>
   </header>`;
 }
 export function renderBottomNav() {
@@ -204,8 +205,8 @@ export function renderBottomNav() {
   const unread = D().notifs.some(n => !n.read && n.type !== 'update');
   const b = (route, label, icon, extra = '') =>
     `<button class="${r === route ? 'on' : ''}" data-a="go" data-r="${route}">${ic(icon, 19)}<span>${label}</span>${extra}</button>`;
-  return `<nav class="bottomnav" aria-label="Primary">
-    ${b('home', 'Home', 'house')}${b('mytasks', 'My Tasks', 'circle-check')}${b('projects', 'Projects', 'folder-kanban')}${b('inbox', 'Inbox', 'inbox', unread ? '<span class="bdot"></span>' : '')}
-    <button data-a="openMnav">${ic('ellipsis', 19)}<span>More</span></button>
+  return `<nav class="bottomnav" aria-label="${t('Primary')}">
+    ${b('home', t('Home'), 'house')}${b('mytasks', t('My Tasks'), 'circle-check')}${b('projects', t('Projects'), 'folder-kanban')}${b('inbox', t('Inbox'), 'inbox', unread ? '<span class="bdot"></span>' : '')}
+    <button data-a="openMnav">${ic('ellipsis', 19)}<span>${t('More')}</span></button>
   </nav>`;
 }

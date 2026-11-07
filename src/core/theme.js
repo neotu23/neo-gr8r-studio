@@ -1,10 +1,13 @@
 /* ---------- theme ---------- */
-import { setDateFormat } from './utils.js';
+import { setDateFormat, syncDateLocale } from './utils.js';
 import { S } from './store.js';
+import { setLang } from './i18n.js';
 
 export function applyPrefs() {
   const r = document.documentElement,
     p = S.prefs;
+  setLang(p.lang);
+  syncDateLocale();
   setDateFormat(p.dateFmt);
   if (p.theme === 'system') r.removeAttribute('data-theme');
   else r.setAttribute('data-theme', p.theme);

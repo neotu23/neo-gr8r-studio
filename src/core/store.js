@@ -1,6 +1,7 @@
 /* ---------- store ---------- */
 import { TODAY, diffD, iso, parse, uid } from './utils.js';
 import { PCOLORS, TEAMS_SEED } from './constants.js';
+import { detectLang, normalizeLang, setLang } from './i18n.js';
 import { seed } from '../data/seed.js';
 
 export const STORE_KEY = 'gr8r.v2';
@@ -11,7 +12,7 @@ export const DEFAULT_PREFS = {
   density: 'comfortable',
   weekStart: 1,
   dateFmt: 'MMM d',
-  lang: 'English (US)',
+  lang: detectLang(),
   tz: '(GMT-07:00) Pacific Time',
   motion: 'system',
   home: 'home',
@@ -32,9 +33,14 @@ export function load() {
   return null;
 }
 export const saved = load();
+const prefs = Object.assign({}, DEFAULT_PREFS, saved?.prefs || {});
+prefs.lang = normalizeLang(prefs.lang);
+/* The locale has to be settled before seed() runs, otherwise the demo data is
+   generated in English even though the UI opens in Chinese. */
+setLang(prefs.lang);
 export const S = {
   data: saved?.data || seed(),
-  prefs: Object.assign({}, DEFAULT_PREFS, saved?.prefs || {}),
+  prefs,
   views: saved?.views || {},
   ui: {
     fx: {},

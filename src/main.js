@@ -59,7 +59,7 @@ import { A } from './actions/actions.js';
 import { ROUTE_NAMES, render, go } from './shell/render.js';
 
 (function init() {
-  document.documentElement.lang = 'en';
+  /* <html lang> is kept in sync by core/i18n.js (setLang), applied on every render. */
   if (!document.getElementById('sr-live')) {
     const l = document.createElement('div');
     l.id = 'sr-live';

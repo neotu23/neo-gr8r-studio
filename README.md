@@ -71,6 +71,29 @@ Dependencies point downward:
   design-system menu and keeps the native element as the source of truth.
 - **Icons:** call `ic('name')` with any [Lucide](https://lucide.dev) icon name. The
   `virtual:icons` plugin bundles only the icons the source uses.
+- **Copy:** never hard-code user-facing text. Wrap it in `t('English source string')` from
+  `core/i18n.js` and add the translation to that module's dictionary. Interpolate with named
+  parameters — `t('{n} days until {date}', { n, date })` — and use `tn(n, one, other)` when the
+  English needs singular/plural forms. Strings the dictionary does not know fall back to English.
+  Note that `t` is also a common local name for a task object; import it as `t as tr` in those
+  modules.
+
+## Internationalization
+
+The UI ships in English (US) and Simplified Chinese (简体中文).
+
+- **Switching:** Settings → Language, or pick the language from the launch screen. The choice is
+  stored in `prefs.lang`, `<html lang>` follows it, and `document.documentElement.lang` drives the
+  CJK font stack and line height in `styles/base.css`.
+- **First visit:** `detectLang()` reads `navigator.languages`, so Chinese browsers open in Chinese.
+- **Coverage:** shell, every page, view, overlay, toast and validation message. Dates, relative
+  times (`ago`, `relDate`, `dayBucket`) and month/weekday labels come from `core/i18n.js`, so
+  `fmtDate` renders `11月7日` in Chinese and `Nov 7` in English.
+- **Demo data:** `data/seed.js` translates its sample workspace through `localizeDemo()`. The data
+  is stamped `demo: true`; switching language re-seeds it unless the user has edited anything
+  (tracked via `data.touched` in `mutate()`).
+- **Adding a language:** add an entry to `LOCALES`, extend `MONTHS`/`WEEKDAYS`, and add a
+  dictionary keyed by the English source strings.
 
 ## Continuous integration
 

@@ -1,6 +1,7 @@
 /* =====================================================================
    ACTIONS · ARCHIVE: restore and purge
    ===================================================================== */
+import { t as tr } from '../core/i18n.js';
 import { esc } from '../core/utils.js';
 import { logAct, task } from '../core/store.js';
 import { mutate, toast } from '../ui/toast.js';
@@ -15,7 +16,7 @@ A.restoreTask = el => {
       logAct('restored', t);
     })
   )
-    toast(`Restored “${t.title}”`, { action: 'Open', onAction: () => A.openTask({ dataset: { id: t.id } }) });
+    toast(tr('Restored “{title}”', { title: t.title }), { action: tr('Open'), onAction: () => A.openTask({ dataset: { id: t.id } }) });
 };
 A.purgeTask = el => {
   const t = task(el.dataset.id);
@@ -25,7 +26,7 @@ A.purgeTask = el => {
     ok: 'Delete permanently',
     danger: true,
     run: () => {
-      if (mutate(() => deleteTasks([t.id]))) toast(`Deleted “${t.title}”`);
+      if (mutate(() => deleteTasks([t.id]))) toast(tr('Deleted “{title}”', { title: t.title }));
     },
   });
 };

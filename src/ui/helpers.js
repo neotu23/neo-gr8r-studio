@@ -1,12 +1,13 @@
 /* ---------- small render helpers ---------- */
 import { TODAY, diffD, esc, parse, relDate } from '../core/utils.js';
+import { t } from '../core/i18n.js';
 import { ic } from '../core/icons.js';
 import { LB, PR, PSTAT, ST } from '../core/constants.js';
 import { D, mem, pColor } from '../core/store.js';
 
 export function av(id, cls = '', tip = true) {
   const m = mem(id);
-  if (!m) return `<span class="av empty ${cls}" ${tip ? 'data-tip="Unassigned"' : ''}>${ic('user', 11)}</span>`;
+  if (!m) return `<span class="av empty ${cls}" ${tip ? `data-tip="${t('Unassigned')}"` : ''}>${ic('user', 11)}</span>`;
   const ini = m.name
     .split(' ')
     .map(x => x[0])
@@ -41,11 +42,11 @@ export function prIcon(p, s = 14) {
   const bar = (x, h, on) => `<rect x="${x}" y="${12 - h}" width="2.6" height="${h}" rx="1" fill="${on ? 'var(--text-2)' : 'var(--border-strong)'}"/>`;
   return `<svg width="${s}" height="${s}" viewBox="0 0 14 14" aria-hidden="true" style="flex-shrink:0">${bar(1.8, 4.5, w >= 1)}${bar(5.7, 7.5, w >= 2)}${bar(9.6, 10.5, w >= 3)}</svg>`;
 }
-export const stPill = st => `${stIcon(st)}<span>${ST[st].name}</span>`;
-export const prPill = p => `${prIcon(p)}<span>${PR[p || 'none'].name}</span>`;
-export const lbl = id => (LB[id] ? `<span class="lbl" style="--c:${LB[id].c}"><i></i>${LB[id].name}</span>` : '');
+export const stPill = st => `${stIcon(st)}<span>${t(ST[st].name)}</span>`;
+export const prPill = p => `${prIcon(p)}<span>${t(PR[p || 'none'].name)}</span>`;
+export const lbl = id => (LB[id] ? `<span class="lbl" style="--c:${LB[id].c}"><i></i>${t(LB[id].name)}</span>` : '');
 export const pIcon = (p, cls = '', s = 15) => `<span class="picon ${cls}" style="--c:${pColor(p)}">${ic(p.icon, s)}</span>`;
-export const pStatus = s => `<span class="pstatus" style="--c:${PSTAT[s].c}"><i></i>${PSTAT[s].name}</span>`;
+export const pStatus = s => `<span class="pstatus" style="--c:${PSTAT[s].c}"><i></i>${t(PSTAT[s].name)}</span>`;
 export function dueHtml(t, withIcon = true) {
   if (!t.due) return '';
   const n = diffD(parse(t.due), TODAY);

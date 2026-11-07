@@ -1,6 +1,7 @@
 /* =====================================================================
-   QUIRE — core: utils, icons, seed data, store, render loop, events
+   CORE — utils: dates, formatting, small helpers shared everywhere
    ===================================================================== */
+import { MONTHS, MONTHS_LONG, WEEKDAYS, WEEKDAYS_LONG, getLang, isZh, t } from './i18n.js';
 // Web fonts load without blocking first paint (the link starts as media=print).
 document.querySelectorAll('link[data-font]').forEach(l => {
   l.media = 'all';
@@ -37,10 +38,19 @@ export const addD = (d, n) => {
 };
 export const dOff = n => iso(addD(TODAY, n));
 export const diffD = (a, b) => Math.round((sod(a) - sod(b)) / DAY);
-export const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-export const MONL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-export const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-export const WDL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+/* Month and weekday labels are swapped in place by `syncDateLocale()` (called
+   from core/theme.js on every render) so importers never hold a stale copy. */
+export const MON = [...MONTHS.en];
+export const MONL = [...MONTHS_LONG.en];
+export const WD = [...WEEKDAYS.en];
+export const WDL = [...WEEKDAYS_LONG.en];
+export function syncDateLocale() {
+  const l = getLang();
+  MON.splice(0, MON.length, ...MONTHS[l]);
+  MONL.splice(0, MONL.length, ...MONTHS_LONG[l]);
+  WD.splice(0, WD.length, ...WEEKDAYS[l]);
+  WDL.splice(0, WDL.length, ...WEEKDAYS_LONG[l]);
+}
 /* Set from preferences on every render (core/theme.js), so utils never depends on the store. */
 export let dateFormat = 'MMM d';
 export function setDateFormat(f) {
@@ -53,32 +63,34 @@ export function fmtDate(s, long) {
   if (fmt === 'd/M') return `${d.getDate()}/${d.getMonth() + 1}${long ? '/' + d.getFullYear() : ''}`;
   if (fmt === 'M/d') return `${d.getMonth() + 1}/${d.getDate()}${long ? '/' + d.getFullYear() : ''}`;
   if (fmt === 'yyyy-MM-dd') return iso(d);
-  return `${MON[d.getMonth()]} ${d.getDate()}${long || d.getFullYear() !== TODAY.getFullYear() ? ', ' + d.getFullYear() : ''}`;
+  const y = long || d.getFullYear() !== TODAY.getFullYear();
+  if (isZh()) return `${y ? d.getFullYear() + '年' : ''}${MON[d.getMonth()]}${d.getDate()}日`;
+  return `${MON[d.getMonth()]} ${d.getDate()}${y ? ', ' + d.getFullYear() : ''}`;
 }
 export function relDate(s) {
   if (!s) return '';
   const n = diffD(parse(s), TODAY);
-  if (n === 0) return 'Today';
-  if (n === 1) return 'Tomorrow';
-  if (n === -1) return 'Yesterday';
+  if (n === 0) return t('Today');
+  if (n === 1) return t('Tomorrow');
+  if (n === -1) return t('Yesterday');
   if (n > 1 && n < 7) return WD[parse(s).getDay()];
   return fmtDate(s);
 }
 export function ago(ts) {
   const m = Math.round((Date.now() - ts) / 6e4);
-  if (m < 1) return 'just now';
-  if (m < 60) return m + 'm ago';
+  if (m < 1) return t('just now');
+  if (m < 60) return t('{n}m ago', { n: m });
   const h = Math.round(m / 60);
-  if (h < 24) return h + 'h ago';
+  if (h < 24) return t('{n}h ago', { n: h });
   const d = Math.round(h / 24);
-  if (d < 7) return d + 'd ago';
+  if (d < 7) return t('{n}d ago', { n: d });
   return fmtDate(iso(new Date(ts)));
 }
 export const minsAgo = m => Date.now() - m * 6e4;
 export function dayBucket(ts) {
   const n = diffD(new Date(ts), TODAY);
-  if (n === 0) return 'Today';
-  if (n === -1) return 'Yesterday';
-  if (n > -7) return 'This week';
-  return 'Earlier';
+  if (n === 0) return t('Today');
+  if (n === -1) return t('Yesterday');
+  if (n > -7) return t('This week');
+  return t('Earlier');
 }

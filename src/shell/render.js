@@ -3,6 +3,7 @@
    ===================================================================== */
 import { $, $$ } from '../core/utils.js';
 import { D, S, mem, proj, team } from '../core/store.js';
+import { t } from '../core/i18n.js';
 import { applyPrefs } from '../core/theme.js';
 import { enhanceSelects, selectMenu } from '../ui/select.js';
 import { renderShell } from './layout.js';
@@ -108,11 +109,11 @@ export function tryFocus(key) {
 export function pageTitle() {
   const u = S.ui;
   if (u.auth) return 'Gr8r Studio';
-  let t = ROUTE_NAMES[u.route] || 'Not found';
-  if (u.route === 'project' && proj(u.params.id)) t = `${(PTABS.find(x => x[0] === u.params.tab) || [0, 'Saved view'])[1]} · ${proj(u.params.id).name}`;
-  if (u.route === 'member' && mem(u.params.id)) t = mem(u.params.id).name;
-  if (u.route === 'team' && team(u.params.id)) t = team(u.params.id).name;
-  return `${t} · ${D().ws.name}`;
+  let name = ROUTE_NAMES[u.route] ? t(ROUTE_NAMES[u.route]) : t('Not found');
+  if (u.route === 'project' && proj(u.params.id)) name = `${t((PTABS.find(x => x[0] === u.params.tab) || [0, 'Saved view'])[1])} · ${proj(u.params.id).name}`;
+  if (u.route === 'member' && mem(u.params.id)) name = mem(u.params.id).name;
+  if (u.route === 'team' && team(u.params.id)) name = team(u.params.id).name;
+  return `${name} · ${D().ws.name}`;
 }
 /* Anything clickable is keyboard-reachable: non-native [data-a] controls get a role and a tab stop. */
 export function makeFocusable() {

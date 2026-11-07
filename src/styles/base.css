@@ -10,6 +10,17 @@ html,
 body {
   height: 100%;
 }
+/* Chinese runs need their own family stack and a touch more leading: CJK glyphs
+   are denser than Latin at the same size, and Geist has no CJK coverage. */
+html[lang='zh-CN'] {
+  --font:
+    'Geist', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+html[lang='zh-CN'] body {
+  line-height: 1.55;
+  font-feature-settings: normal;
+}
 body {
   margin: 0;
   background: var(--bg);

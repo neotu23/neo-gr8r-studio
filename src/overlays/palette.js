@@ -1,5 +1,6 @@
 /* ---------------- COMMAND PALETTE ---------------- */
 import { MOD, clamp, esc } from '../core/utils.js';
+import { t as tr } from '../core/i18n.js';
 import { LOGO, ic, wsLogo } from '../core/icons.js';
 import { PSTAT } from '../core/constants.js';
 import { D, S, allTasks, pColor, proj, save, task } from '../core/store.js';
@@ -66,12 +67,12 @@ export function paletteItems() {
       name: 'Switch workspace',
       items: D()
         .workspaces.filter(w => !q || w.name.toLowerCase().includes(ql))
-        .map(w => ({ html: `${wsLogo(w, 20)}`, name: w.name, sub: w.plan + ' plan', run: () => A.switchWs({ dataset: { v: w.id } }) })),
+        .map(w => ({ html: `${wsLogo(w, 20)}`, name: w.name, sub: tr('{plan} plan', { plan: w.plan }), run: () => A.switchWs({ dataset: { v: w.id } }) })),
     });
     return groups;
   }
   if (pl.mode === 'cmd') {
-    const cmds = commands().filter(c => !q || c.name.toLowerCase().includes(ql));
+    const cmds = commands().filter(c => !q || c.name.toLowerCase().includes(ql) || tr(c.name).toLowerCase().includes(ql));
     if (!q) {
       groups.push({ name: 'Suggestions', items: cmds.slice(0, 3).concat(cmds.filter(c => c.id === 'c-dark' || c.id === 'c-ws')) });
       const recent = sortTasks(
@@ -112,16 +113,16 @@ export function paletteItems() {
     groups.push({
       name: 'Suggested',
       items: [
-        { icon: 'clock-alert', name: 'Overdue tasks', run: () => A.goTasks({ dataset: { f: 'overdue' } }) },
-        { icon: 'user', name: 'Tasks assigned to me', run: () => go('mytasks') },
+        { icon: 'clock-alert', name: tr('Overdue tasks'), run: () => A.goTasks({ dataset: { f: 'overdue' } }) },
+        { icon: 'user', name: tr('Tasks assigned to me'), run: () => go('mytasks') },
         {
           icon: 'signal-high',
-          name: 'High priority in Website Redesign',
+          name: tr('High priority in {project}', { project: 'Website Redesign' }),
           run: () => {
             go('project', { id: 'p1', tab: 'v:v1' });
           },
         },
-        { icon: 'paperclip', name: 'Files in Website Redesign', run: () => go('project', { id: 'p1', tab: 'files' }) },
+        { icon: 'paperclip', name: tr('Files in {project}', { project: 'Website Redesign' }), run: () => go('project', { id: 'p1', tab: 'files' }) },
       ],
     });
     return groups;
@@ -140,7 +141,7 @@ export function paletteItems() {
       items: r.projects.slice(0, lim).map(p => ({
         html: `<span class="pdot" style="--c:${pColor(p)}"></span>`,
         name: p.name,
-        sub: PSTAT[p.status].name,
+        sub: tr(PSTAT[p.status].name),
         run: () => go('project', { id: p.id }),
       })),
     });
@@ -163,9 +164,12 @@ export function paletteItems() {
   if (sc === 'all' || sc === 'comments')
     groups.push({
       name: 'Comments',
-      items: r.comments
-        .slice(0, lim)
-        .map(c => ({ html: av(c.by, 'sm', false), name: c.text, sub: 'on ' + task(c.task).title, run: () => A.openTask({ dataset: { id: c.task } }) })),
+      items: r.comments.slice(0, lim).map(c => ({
+        html: av(c.by, 'sm', false),
+        name: c.text,
+        sub: tr('on {task}', { task: task(c.task).title }),
+        run: () => A.openTask({ dataset: { id: c.task } }),
+      })),
     });
   const out = groups.filter(g => g.items.length);
   out.push({
@@ -173,7 +177,7 @@ export function paletteItems() {
     items: [
       {
         icon: 'search',
-        name: `View all results for “${q}”`,
+        name: tr('View all results for “{q}”', { q }),
         run: () => {
           S.ui.searchQ = q;
           S.ui.searchCat = sc;
@@ -194,18 +198,23 @@ export function paletteHtml() {
   pl._flat = flat;
   pl.hl = clamp(pl.hl, 0, Math.max(flat.length - 1, 0));
   let idx = 0;
-  const ph = pl.mode === 'search' ? 'Search tasks, projects, people, files, comments…' : pl.mode === 'ws' ? 'Find a workspace…' : 'Type a command or search…';
-  return `<div class="palette" role="dialog" aria-modal="true" aria-label="Command menu">
-    <div class="pal-in">${ic(pl.mode === 'search' ? 'search' : 'command', 17)}${pl.mode !== 'cmd' ? `<span class="badge" style="flex-shrink:0">${pl.mode === 'search' ? 'Search' : 'Workspace'}</span>` : ''}<input id="pal-in" data-in="palQ" value="${esc(pl.q)}" placeholder="${ph}" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="pal-list" aria-activedescendant="pi-${pl.hl}"><kbd>Esc</kbd></div>
+  const ph =
+    pl.mode === 'search'
+      ? tr('Search tasks, projects, people, files, comments…')
+      : pl.mode === 'ws'
+        ? tr('Find a workspace…')
+        : tr('Type a command or search…');
+  return `<div class="palette" role="dialog" aria-modal="true" aria-label="${tr('Command menu')}">
+    <div class="pal-in">${ic(pl.mode === 'search' ? 'search' : 'command', 17)}${pl.mode !== 'cmd' ? `<span class="badge" style="flex-shrink:0">${pl.mode === 'search' ? tr('Search') : tr('Workspace')}</span>` : ''}<input id="pal-in" data-in="palQ" value="${esc(pl.q)}" placeholder="${ph}" autocomplete="off" role="combobox" aria-expanded="true" aria-controls="pal-list" aria-activedescendant="pi-${pl.hl}"><kbd>Esc</kbd></div>
     ${
       pl.mode === 'search'
         ? `<div class="pal-scope" role="tablist">${[
-            ['all', 'All', 'layers'],
-            ['tasks', 'Tasks', 'circle-check'],
-            ['projects', 'Projects', 'folder'],
-            ['people', 'People', 'users'],
-            ['files', 'Files', 'paperclip'],
-            ['comments', 'Comments', 'message-square'],
+            ['all', tr('All'), 'layers'],
+            ['tasks', tr('Tasks'), 'circle-check'],
+            ['projects', tr('Projects'), 'folder'],
+            ['people', tr('People'), 'users'],
+            ['files', tr('Files'), 'paperclip'],
+            ['comments', tr('Comments'), 'message-square'],
           ]
             .map(([k, n, i]) => `<button role="tab" class="${pl.scope === k ? 'on' : ''}" data-a="palScope" data-v="${k}">${ic(i, 12)}${n}</button>`)
             .join('')}</div>`
@@ -216,10 +225,10 @@ export function paletteHtml() {
         ? groups
             .map(
               g =>
-                `<div class="pal-group">${g.name ? `<div class="pal-sec">${g.name}</div>` : ''}${g.items
+                `<div class="pal-group">${g.name ? `<div class="pal-sec">${tr(g.name)}</div>` : ''}${g.items
                   .map(it => {
                     const i = idx++;
-                    return `<div class="pi ${i === pl.hl ? 'hl' : ''}" id="pi-${i}" role="option" aria-selected="${i === pl.hl}" data-a="palRun" data-i="${i}" data-hover-i="${i}">${it.html || ic(it.icon || 'circle', 15)}<span class="trunc">${hl(it.name, pl.q.trim())}</span>${it.sub ? `<span class="sub">${esc(it.sub)}</span>` : ''}<span class="r">${it.r ? `<span class="mono">${esc(it.r)}</span>` : ''}${
+                    return `<div class="pi ${i === pl.hl ? 'hl' : ''}" id="pi-${i}" role="option" aria-selected="${i === pl.hl}" data-a="palRun" data-i="${i}" data-hover-i="${i}">${it.html || ic(it.icon || 'circle', 15)}<span class="trunc">${hl(tr(it.name), pl.q.trim())}</span>${it.sub ? `<span class="sub">${esc(tr(it.sub))}</span>` : ''}<span class="r">${it.r ? `<span class="mono">${esc(it.r)}</span>` : ''}${
                       it.kbd
                         ? it.kbd
                             .split(' ')
@@ -231,8 +240,8 @@ export function paletteHtml() {
                   .join('')}</div>`,
             )
             .join('')
-        : `<div class="empty-state sm"><div class="glyph">${ic('search-x', 18)}</div><h2 class="es-h">No results found</h2><p>Try a different keyword, or press Tab to search everything.</p></div>`
+        : `<div class="empty-state sm"><div class="glyph">${ic('search-x', 18)}</div><h2 class="es-h">${tr('No results found')}</h2><p>${tr('Try a different keyword, or press Tab to search everything.')}</p></div>`
     }</div>
-    <div class="pal-f"><span><kbd>↑</kbd><kbd>↓</kbd>navigate</span><span><kbd>↵</kbd>select</span>${pl.mode === 'cmd' ? '<span><kbd>Tab</kbd>search mode</span>' : '<span><kbd>⌫</kbd>back to commands</span>'}<span class="sp" style="flex:1"></span><span>${LOGO(12)}</span></div>
+    <div class="pal-f"><span><kbd>↑</kbd><kbd>↓</kbd>${tr('navigate')}</span><span><kbd>↵</kbd>${tr('select')}</span>${pl.mode === 'cmd' ? `<span><kbd>Tab</kbd>${tr('search mode')}</span>` : `<span><kbd>⌫</kbd>${tr('back to commands')}</span>`}<span class="sp" style="flex:1"></span><span>${LOGO(12)}</span></div>
   </div>`;
 }

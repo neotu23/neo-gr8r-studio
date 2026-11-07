@@ -1,4 +1,5 @@
 /* ---------- drag & drop ---------- */
+import { t as tr } from '../core/i18n.js';
 import { $, $$, addD, diffD, fmtDate, iso, parse } from '../core/utils.js';
 import { PR, ST } from '../core/constants.js';
 import { D, S, proj, save, task } from '../core/store.js';
@@ -151,7 +152,7 @@ document.addEventListener('drop', e => {
       t.order = order;
       if (moved) applyPatch(t, { status: d.col });
     });
-    if (moved) toast(`Moved “${t.title}” to ${ST[d.col].name}`, { ms: 2200 });
+    if (moved) toast(tr('Moved “{title}” to {status}', { title: t.title, status: tr(ST[d.col].name) }), { ms: 2200 });
   } else if (d.type === 'row' && d.target) {
     const t = task(d.id),
       tg = task(d.target);
@@ -180,14 +181,14 @@ document.addEventListener('drop', e => {
         switched = true;
       }
     });
-    if (switched) toast('Sorted manually to keep your order', { kind: 'info', ms: 2200 });
+    if (switched) toast(tr('Sorted manually to keep your order'), { kind: 'info', ms: 2200 });
   } else if (d.type === 'cal' && d.day) {
     const t = task(d.id);
     if (t.due === d.day) return;
     const len = t.start && t.due ? diffD(parse(t.due), parse(t.start)) : null;
     fxSet({ moved: t.id });
     updateTask(t.id, { due: d.day, ...(len != null ? { start: iso(addD(parse(d.day), -len)) } : {}) });
-    toast(`Rescheduled “${t.title}” to ${fmtDate(d.day)}`, { ms: 2200 });
+    toast(tr('Rescheduled “{title}” to {date}', { title: t.title, date: fmtDate(d.day) }), { ms: 2200 });
   } else if (d.type === 'proj' && d.before && d.before !== d.id) {
     const o = D().projOrder.filter(x => x !== d.id);
     o.splice(o.indexOf(d.before), 0, d.id);
@@ -262,7 +263,7 @@ document.addEventListener('pointerdown', e => {
       return;
     }
     updateTask(t.id, { due: iso(addD(parse(t.due), days)), start: t.start ? iso(addD(parse(t.start), days)) : null });
-    toast(`Moved “${t.title}” ${Math.abs(days)} day${Math.abs(days) > 1 ? 's' : ''} ${days > 0 ? 'later' : 'earlier'}`, { ms: 2200 });
+    toast(tr(days > 0 ? 'Moved “{title}” {n} days later' : 'Moved “{title}” {n} days earlier', { title: t.title, n: Math.abs(days) }), { ms: 2200 });
   };
   addEventListener('pointermove', mv);
   addEventListener('pointerup', up);

@@ -5,3 +5,6 @@ dist/
 __MACOSX/
 *.log
 .env*
+
+# Reasonix task snapshots (local tooling)
+.reasonix/

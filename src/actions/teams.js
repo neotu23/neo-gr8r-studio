@@ -1,6 +1,7 @@
 /* =====================================================================
    ACTIONS · TEAMS: create, edit, delete
    ===================================================================== */
+import { t as tr } from '../core/i18n.js';
 import { $, uid } from '../core/utils.js';
 import { PCOLORS } from '../core/constants.js';
 import { D, S, mem, team, teamsList } from '../core/store.js';
@@ -86,10 +87,10 @@ A.submitTeam = () => {
   S.ui.modals.pop();
   if (m.edit) {
     render();
-    toast(`Saved ${t.name}`);
+    toast(tr('Saved {name}', { name: t.name }));
   } else {
     go('team', { id: t.id });
-    toast(`Created ${t.name}`);
+    toast(tr('Created {name}', { name: t.name }));
   }
 };
 A.delTeam = el => {
@@ -117,7 +118,7 @@ A.delTeam = el => {
         })
       ) {
         if (S.ui.route === 'team') go('teams');
-        toast(`Deleted ${t.name}`, { action: 'Undo', onAction: () => restore(snap) });
+        toast(tr('Deleted {name}', { name: t.name }), { action: tr('Undo'), onAction: () => restore(snap) });
       }
     },
   });

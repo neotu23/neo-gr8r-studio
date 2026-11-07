@@ -1,6 +1,7 @@
 /* =====================================================================
    ACTIONS · SUBTASKS: open, navigate, rename, notes, promote
    ===================================================================== */
+import { t as tr } from '../core/i18n.js';
 import { $, esc } from '../core/utils.js';
 import { S, logAct, save, task } from '../core/store.js';
 import { mutate, toast } from '../ui/toast.js';
@@ -76,5 +77,5 @@ A.promoteSub = el => {
     return;
   S.ui.subOpen = null;
   render();
-  toast(`Converted to ${n.key}`, { action: 'Open', onAction: () => A.openTask({ dataset: { id: n.id } }) });
+  toast(tr('Converted to {key}', { key: n.key }), { action: tr('Open'), onAction: () => A.openTask({ dataset: { id: n.id } }) });
 };
